@@ -1,3 +1,3 @@
 # 3MTT Cloud Engineering – Beginner Module Assessment
 ## Automating the provisioning of two Ubuntu-based servers, named “Master” and “Slave”, using Vagrant.
-## Below is the documentation of steps for the project 
+## The Documentation is included in the Althschool assessment mark down file
