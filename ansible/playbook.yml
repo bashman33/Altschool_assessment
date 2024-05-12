@@ -1,0 +1,48 @@
+---
+
+- hosts: slave
+  become: 'yes'
+  tasks:
+    - name: Copy mylampscript.sh script to slave node
+      copy:
+        src: /home/vagrant/mylampscript.sh
+        dest: /home/vagrant/mylampscript.sh
+        mode: 493
+    - name: Execute mylampscript.sh script on slave node
+      shell: /home/vagrant/mylampscript.sh
+- name: Create a cron job to check server's uptime every 12 am
+  hosts: slave
+  become: 'yes'
+  tasks:
+    - name: Create the uptime script
+      copy:
+        content: |
+
+          #!/bin/bash
+
+          # Log the server's uptime to a file
+          uptime > /var/log/system_uptime.log
+        dest: /usr/local/bin/view_uptime.sh
+        mode: '0755'
+    - name: Create a cron job to check uptime every 12 am
+      cron:
+        name: Check uptime every 12 am
+        job: /usr/local/bin/view_uptime.sh
+        minute: '0'
+        hour: '0'
+        state: present
+    - name: Display uptime log file
+      shell: cat /var/log/system_uptime.log
+      register: uptime_output
+    - name: Display the server's uptime
+      debug:
+        msg: '{{ uptime_output.stdout }}'
+    - name: Fetch PHP application content using curl
+      command: 'curl -s http://192.168.56.42'
+      register: php_application
+      ignore_errors: true
+    - name: Display content of PHP application
+      debug:
+        msg: |-
+          PHP Application Content:
+          {{ php_application.stdout }}
